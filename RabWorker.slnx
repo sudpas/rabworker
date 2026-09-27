@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RabWorker.Contracts/RabWorker.Contracts.csproj" />
+    <Project Path="src/RabWorker.TestClient/RabWorker.TestClient.csproj" />
+    <Project Path="src/RabWorker.Worker/RabWorker.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RabWorker.Tests/RabWorker.Tests.csproj" />
+  </Folder>
+</Solution>
