@@ -1,11 +1,6 @@
-using System.Collections.Frozen;
-
 namespace RabWorker.Contracts;
 
-/// <summary>
-/// Patchable form fields. Names are used verbatim as JSON keys in <see cref="FormUpdateMessage.Fields"/>
-/// and as column names in the person_form table.
-/// </summary>
+/// <summary>Patchable form fields. Names double as JSON keys and person_form column names.</summary>
 public static class FormFields
 {
     public const string FirstName = "first_name";
@@ -18,8 +13,6 @@ public static class FormFields
     public const string State = "state";
     public const string PostalCode = "postal_code";
 
-    public static readonly FrozenSet<string> All = new[]
-    {
-        FirstName, LastName, Email, Phone, DateOfBirth, AddressLine1, City, State, PostalCode,
-    }.ToFrozenSet(StringComparer.Ordinal);
+    public static readonly string[] All =
+        [FirstName, LastName, Email, Phone, DateOfBirth, AddressLine1, City, State, PostalCode];
 }

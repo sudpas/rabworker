@@ -9,7 +9,7 @@ public class FormRepositoryTests(PostgresFixture db) : IClassFixture<PostgresFix
 {
     private readonly FormRepository _repo = new(db.DataSource);
 
-    private static FormPatch Patch(Guid person, long version, params (string Field, object? Value)[] values) =>
+    private static FormUpdateMessage Patch(Guid person, long version, params (string Field, string? Value)[] values) =>
         new(Guid.NewGuid(), person, version, DateTimeOffset.UtcNow, values.ToDictionary(v => v.Field, v => v.Value));
 
     private async Task<Dictionary<string, object?>> RowAsync(Guid person)
@@ -28,10 +28,10 @@ public class FormRepositoryTests(PostgresFixture db) : IClassFixture<PostgresFix
         var person = Guid.NewGuid();
 
         // v3 arrives first, then v1 (full form), then v2. v1 must not overwrite v3's email.
-        Assert.True(await _repo.ApplyAsync(Patch(person, 3, (FormFields.Email, "v3@x.com")), default));
-        Assert.True(await _repo.ApplyAsync(Patch(person, 1,
-            (FormFields.FirstName, "Ada"), (FormFields.Email, "v1@x.com"), (FormFields.Phone, "111")), default));
-        Assert.True(await _repo.ApplyAsync(Patch(person, 2, (FormFields.Phone, "222")), default));
+        await _repo.ApplyAsync(Patch(person, 3, (FormFields.Email, "v3@x.com")), default);
+        await _repo.ApplyAsync(Patch(person, 1,
+            (FormFields.FirstName, "Ada"), (FormFields.Email, "v1@x.com"), (FormFields.Phone, "111")), default);
+        await _repo.ApplyAsync(Patch(person, 2, (FormFields.Phone, "222")), default);
 
         var row = await RowAsync(person);
         Assert.Equal("Ada", row["first_name"]);
@@ -41,13 +41,13 @@ public class FormRepositoryTests(PostgresFixture db) : IClassFixture<PostgresFix
     }
 
     [Fact]
-    public async Task Replayed_message_is_a_no_op()
+    public async Task Replayed_message_is_idempotent()
     {
         var person = Guid.NewGuid();
-        var patch = Patch(person, 1, (FormFields.FirstName, "Grace"), (FormFields.DateOfBirth, new DateOnly(1906, 12, 9)));
+        var patch = Patch(person, 1, (FormFields.FirstName, "Grace"), (FormFields.DateOfBirth, "1906-12-09"));
 
-        Assert.True(await _repo.ApplyAsync(patch, default));
-        Assert.False(await _repo.ApplyAsync(patch, default));
+        await _repo.ApplyAsync(patch, default);
+        await _repo.ApplyAsync(patch, default);
         Assert.Equal(new DateOnly(1906, 12, 9), (await RowAsync(person))["date_of_birth"]);
     }
 

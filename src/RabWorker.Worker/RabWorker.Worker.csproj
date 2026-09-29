@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="RabWorker.Tests" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\RabWorker.Contracts\RabWorker.Contracts.csproj" />
   </ItemGroup>
 </Project>

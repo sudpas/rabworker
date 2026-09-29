@@ -28,7 +28,7 @@ public sealed class EndToEndTests(PostgresFixture db) : IClassFixture<PostgresFi
             ["Worker:RabbitMqUri"] = _rabbit.GetConnectionString(),
             ["Worker:PostgresConnectionString"] = db.ConnectionString,
         });
-        builder.Services.AddFormWorker(builder.Configuration);
+        builder.Services.AddHostedService<FormWorker>();
         _host = builder.Build();
         await _host.StartAsync();
 
@@ -51,7 +51,7 @@ public sealed class EndToEndTests(PostgresFixture db) : IClassFixture<PostgresFi
 
     private static byte[] Message(Guid person, long version, object fields) =>
         JsonSerializer.SerializeToUtf8Bytes(new FormUpdateMessage(Guid.NewGuid(), person, version, DateTimeOffset.UtcNow,
-            JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(JsonSerializer.Serialize(fields))!), FormJson.Options);
+            JsonSerializer.Deserialize<Dictionary<string, string?>>(JsonSerializer.Serialize(fields))!), FormJson.Options);
 
     private static async Task Eventually(Func<Task<bool>> condition)
     {

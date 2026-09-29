@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging.Abstractions;
 using Npgsql;
 using RabWorker.Worker;
 using Testcontainers.PostgreSql;
@@ -16,7 +15,7 @@ public sealed class PostgresFixture : IAsyncLifetime
     {
         await _container.StartAsync();
         DataSource = NpgsqlDataSource.Create(ConnectionString);
-        await new SchemaInitializer(DataSource, NullLogger<SchemaInitializer>.Instance).StartAsync(default);
+        await new FormRepository(DataSource).EnsureSchemaAsync(default);
     }
 
     public async Task DisposeAsync()

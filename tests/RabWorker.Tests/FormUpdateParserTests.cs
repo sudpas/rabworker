@@ -8,7 +8,7 @@ public class FormUpdateParserTests
 {
     private const string PersonId = "5b1f7c0e-8f4e-4a5a-9f59-0c2f7d6b3a11";
 
-    private static FormPatch Parse(string json) => FormUpdateParser.Parse(Encoding.UTF8.GetBytes(json));
+    private static FormUpdateMessage Parse(string json) => FormUpdateParser.Parse(Encoding.UTF8.GetBytes(json));
 
     private static string Msg(string fields, long version = 3) =>
         $$"""{"messageId":"{{Guid.NewGuid()}}","personId":"{{PersonId}}","version":{{version}},"occurredAt":"2026-01-02T03:04:05Z","fields":{{fields}}}""";
@@ -20,10 +20,10 @@ public class FormUpdateParserTests
 
         Assert.Equal(Guid.Parse(PersonId), patch.PersonId);
         Assert.Equal(3, patch.Version);
-        Assert.Equal("a@b.com", patch.Values[FormFields.Email]);
-        Assert.Equal(new DateOnly(1990, 5, 17), patch.Values[FormFields.DateOfBirth]);
-        Assert.True(patch.Values.ContainsKey(FormFields.Phone));
-        Assert.Null(patch.Values[FormFields.Phone]);
+        Assert.Equal("a@b.com", patch.Fields[FormFields.Email]);
+        Assert.Equal("1990-05-17", patch.Fields[FormFields.DateOfBirth]);
+        Assert.True(patch.Fields.ContainsKey(FormFields.Phone));
+        Assert.Null(patch.Fields[FormFields.Phone]);
     }
 
     [Theory]
